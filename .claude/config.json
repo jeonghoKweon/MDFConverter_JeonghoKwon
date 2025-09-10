@@ -1,0 +1,27 @@
+{
+  "project_type": "web_application",
+  "technology": "vanilla_web",
+  "main_file": "index.html",
+  "description": "Pure HTML/CSS/JavaScript MDF file visualization tool",
+  "languages": ["javascript", "html", "css"],
+  "frameworks": ["vanilla_js", "plotly"],
+  "commands": {
+    "run": "브라우저에서 index.html 열기",
+    "serve": "python -m http.server 8000",
+    "test": "브라우저에서 localhost:8000 접속"
+  },
+  "features": [
+    "MDF file parsing simulation",
+    "Channel filtering and search",
+    "Compact pagination (24px buttons)",
+    "Interactive Plotly charts",
+    "Drag & drop file upload",
+    "Responsive design",
+    "Real-time channel search"
+  ],
+  "browser_support": ["Chrome 60+", "Firefox 55+", "Safari 12+", "Edge 79+"],
+  "dependencies": {
+    "external": ["Plotly.js (CDN)"],
+    "internal": "None - pure vanilla JavaScript"
+  }
+}
