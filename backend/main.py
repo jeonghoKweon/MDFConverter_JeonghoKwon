@@ -11,12 +11,18 @@ import io
 from mdf_processor import MDFProcessor
 from models import ChannelInfo, ChannelData, MDFInfo
 
-app = FastAPI(title="MDF File Viewer API", version="1.0.0")
+app = FastAPI(title="MDF File Viewer API_Jeongho Kwon", version="1.0.0")
+
+# 환경 변수 설정
+PORT = int(os.getenv("PORT", 8000))
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",") if os.getenv("CORS_ORIGINS") != "*" else ["*"]
+MAX_FILE_SIZE = int(os.getenv("MAX_FILE_SIZE", 100000000))  # 100MB 기본값
+TEMP_DIR = os.getenv("TEMP_DIR", tempfile.gettempdir())
 
 # CORS 미들웨어 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 프로덕션에서는 구체적인 도메인 지정 권장
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,7 +37,12 @@ uploaded_files: Dict[str, str] = {}
 @app.get("/")
 async def root():
     """API 상태 확인"""
-    return {"message": "MDF File Viewer API", "status": "running"}
+    return {
+        "message": "MDF File Viewer API_Jeongho Kwon", 
+        "status": "running",
+        "port": PORT,
+        "max_file_size_mb": MAX_FILE_SIZE // 1000000
+    }
 
 @app.post("/api/upload")
 async def upload_mdf_file(file: UploadFile = File(...)):
@@ -44,9 +55,17 @@ async def upload_mdf_file(file: UploadFile = File(...)):
                 detail="지원되지 않는 파일 형식입니다. .mdf 또는 .mf4 파일만 지원합니다."
             )
         
+        # 파일 크기 체크
+        content = await file.read()
+        if len(content) > MAX_FILE_SIZE:
+            max_size_mb = MAX_FILE_SIZE // 1000000
+            raise HTTPException(
+                status_code=413, 
+                detail=f"파일 크기가 너무 큽니다. 최대 {max_size_mb}MB까지 업로드 가능합니다."
+            )
+        
         # 임시 파일로 저장
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp_file:
-            content = await file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1], dir=TEMP_DIR) as tmp_file:
             tmp_file.write(content)
             tmp_file_path = tmp_file.name
         
@@ -205,7 +224,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=PORT,
         reload=True,
         log_level="info"
     )
