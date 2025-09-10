@@ -1,6 +1,4 @@
 #!/bin/bash
 echo "Starting MDF File Viewer Backend..."
-echo "Port: $PORT"
-echo "Environment: Production"
 cd backend
-python main.py
+exec gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
