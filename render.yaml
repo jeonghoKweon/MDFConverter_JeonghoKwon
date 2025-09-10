@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: mdf-converter-backend
+    env: python
+    region: oregon
+    plan: free
+    rootDir: ./backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: MAX_FILE_SIZE
+        value: 100000000
+      - key: TEMP_DIR
+        value: /tmp
